@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treasure Hunt - Barcode Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 20px;
+            text-align: center;
+        }
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #e6e6e6;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #barcode-scanner {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Start Treasure Hunt - Enter Details & Scan Barcode</h2>
+    <form id="treasureHuntForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" required>
+
+        <label for="barcode">Barcode:</label>
+        <input type="text" id="barcode" name="barcode" readonly>
+        <video id="barcode-scanner" autoplay></video>
+
+        <button type="button" id="scanBarcodeButton">Scan Barcode</button>
+        <button type="submit">Start Game</button>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<script>
+    document.getElementById('scanBarcodeButton').addEventListener('click', function() {
+        const scanner = document.getElementById('barcode-scanner');
+        scanner.style.display = 'block'; // Show video element for barcode scanning
+
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: scanner,  // Video element
+            },
+            decoder: {
+                readers: ["code_128_reader"] // Barcode format (you can add more formats)
+            }
+        }, function(err) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            Quagga.start(); // Start the barcode scanner
+        });
+
+        Quagga.onDetected(function(result) {
+            const barcode = result.codeResult.code;
+            document.getElementById('barcode').value = barcode;
+            Quagga.stop();
+            scanner.style.display = 'none'; // Hide the video element once barcode is scanned
+        });
+    });
+
+    document.getElementById('treasureHuntForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission to backend
+
+        const name = document.getElementById('name').value;
+        const department = document.getElementById('department').value;
+        const barcode = document.getElementById('barcode').value;
+
+        // Send data to Google Sheets or any API, then start the game
+        alert(`Name: ${name}, Department: ${department}, Barcode: ${barcode}`);
+        
+        // Redirect to the game (replace with the correct game URL)
+        window.location.href = "https://debashrita-byte.github.io/treasurehuntqw/";
+    });
+</script>
+
+</body>
+</html>
